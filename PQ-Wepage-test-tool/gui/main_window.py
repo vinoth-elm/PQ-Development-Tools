@@ -11,12 +11,15 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QMessageBox,
 )
+from core.browser_manager import BrowserManager
 
 
 class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+
+        self.browser_manager = BrowserManager()
 
         self.setWindowTitle("Meter Webpage Test Automation")
         self.setMinimumSize(700, 500)
@@ -150,41 +153,88 @@ class MainWindow(QMainWindow):
         username = self.username_input.text().strip()
         password = self.password_input.text()
 
+        # Validate input
         if not ip:
             QMessageBox.warning(
                 self,
-                "Missing Information",
-                "Please enter the meter IP address."
+                "Input Error",
+                "Please enter Meter IP."
             )
             return
 
         if not username:
             QMessageBox.warning(
                 self,
-                "Missing Information",
-                "Please enter the username."
+                "Input Error",
+                "Please enter Username."
             )
             return
 
         if not password:
             QMessageBox.warning(
                 self,
-                "Missing Information",
-                "Please enter the password."
+                "Input Error",
+                "Please enter Password."
             )
             return
 
-        # Phase 1 only
-        QMessageBox.information(
-            self,
-            "Phase 1",
-            f"Configuration received.\n\n"
-            f"IP: {ip}\n"
-            f"Username: {username}\n\n"
-            f"Browser login will be implemented in Phase 2."
-        )
+        try:
 
-        self.status_label.setText("● Configuration Ready")
+            # Start browser
+            page = self.browser_manager.start()
+
+            # Meter login URL
+            url = f"http://{ip}/login.html"
+
+            # Open login page
+            page.goto(
+                url,
+                wait_until="domcontentloaded"
+            )
+
+            # Enter username
+            page.locator(
+                'input[placeholder="Username"]'
+            ).fill(username)
+
+            # Enter password
+            page.locator(
+                'input[placeholder="Password"]'
+            ).fill(password)
+
+            # Click LOGIN
+            page.get_by_role(
+                "button",
+                name="LOGIN"
+            ).click()
+
+            # Wait for page to settle
+            page.wait_for_load_state(
+                "domcontentloaded"
+            )
+
+            # Update status
+            self.status_label.setText(
+                "● Login Successful"
+            )
+
+            QMessageBox.information(
+                self,
+                "Login",
+                "Login successful."
+            )
+
+        except Exception as e:
+
+            self.status_label.setText(
+                "● Login Failed"
+            )
+
+            QMessageBox.critical(
+                self,
+                "Login Failed",
+                str(e)
+            )
 
     # -----------------------------------------------------
     # Styling
@@ -299,3 +349,16 @@ class MainWindow(QMainWindow):
                 background-color: #d4d9df;
             }
         """)
+
+    # -----------------------------------------------------
+    # Close Application
+    # -----------------------------------------------------
+
+    def closeEvent(self, event):
+
+        try:
+            self.browser_manager.stop()
+        except Exception:
+            pass
+
+        event.accept()
