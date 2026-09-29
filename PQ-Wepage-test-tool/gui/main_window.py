@@ -10,8 +10,13 @@ from PySide6.QtWidgets import (
     QLabel,
     QGroupBox,
     QMessageBox,
+    QFileDialog,
+    QTableWidget,
+    QTableWidgetItem,
+    QHeaderView,
 )
 from core.browser_manager import BrowserManager
+from core.excel_manager import ExcelManager
 
 
 class MainWindow(QMainWindow):
@@ -20,6 +25,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.browser_manager = BrowserManager()
+        self.excel_manager = ExcelManager()
 
         self.setWindowTitle("Meter Webpage Test Automation")
         self.setMinimumSize(700, 500)
@@ -122,6 +128,67 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(status_group)
 
         # -------------------------------------------------
+        # Test Case Excel
+        # -------------------------------------------------
+
+        excel_group = QGroupBox("Test Case Excel")
+
+        excel_layout = QVBoxLayout()
+
+        self.upload_excel_button = QPushButton(
+            "UPLOAD TEST CASES"
+        )
+
+        self.upload_excel_button.setMinimumHeight(40)
+
+        self.upload_excel_button.clicked.connect(
+            self.upload_excel
+        )
+
+        excel_layout.addWidget(
+            self.upload_excel_button
+        )
+
+        excel_group.setLayout(excel_layout)
+
+        main_layout.addWidget(excel_group)
+
+        # -------------------------------------------------
+        # Test Case Table
+        # -------------------------------------------------
+
+        self.test_case_table = QTableWidget()
+
+        self.test_case_table.setColumnCount(10)
+
+        self.test_case_table.setHorizontalHeaderLabels([
+            "ID",
+            "Page",
+            "Test Case",
+            "Action",
+            "Locator Type",
+            "Locator",
+            "Input",
+            "Expected Result",
+            "Validation",
+            "Enabled"
+        ])
+
+        self.test_case_table.setAlternatingRowColors(True)
+
+        self.test_case_table.setEditTriggers(
+            QTableWidget.NoEditTriggers
+        )
+
+        self.test_case_table.horizontalHeader().setStretchLastSection(
+            True
+        )
+
+        main_layout.addWidget(
+            self.test_case_table
+        )
+
+        # -------------------------------------------------
         # Future Test Area
         # -------------------------------------------------
 
@@ -142,6 +209,86 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(test_group)
 
         main_layout.addStretch()
+
+    # -----------------------------------------------------
+    # Upload Excel
+    # -----------------------------------------------------
+
+    def upload_excel(self):
+
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select Test Case Excel File",
+            "",
+            "Excel Files (*.xlsx)"
+        )
+
+        if not file_path:
+            return
+
+        success, result = self.excel_manager.load_test_cases(
+            file_path
+        )
+
+        if not success:
+
+            QMessageBox.critical(
+                self,
+                "Excel Error",
+                result
+            )
+
+            return
+
+        self.display_test_cases(result)
+
+        QMessageBox.information(
+            self,
+            "Excel Loaded",
+            f"{len(result)} test cases loaded successfully."
+        )
+
+    # -----------------------------------------------------
+    # Display Test Cases
+    # -----------------------------------------------------
+
+    def display_test_cases(self, test_cases):
+
+        self.test_case_table.setRowCount(0)
+
+        columns = [
+            "ID",
+            "Page",
+            "Test Case",
+            "Action",
+            "Locator Type",
+            "Locator",
+            "Input",
+            "Expected Result",
+            "Validation",
+            "Enabled"
+        ]
+
+        for row_index, test_case in enumerate(test_cases):
+
+            self.test_case_table.insertRow(row_index)
+
+            for column_index, column_name in enumerate(columns):
+
+                value = test_case.get(
+                    column_name,
+                    ""
+                )
+
+                item = QTableWidgetItem(
+                    str(value)
+                )
+
+                self.test_case_table.setItem(
+                    row_index,
+                    column_index,
+                    item
+                )
 
     # -----------------------------------------------------
     # Login Button
