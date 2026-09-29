@@ -27,6 +27,8 @@ class MainWindow(QMainWindow):
         self.browser_manager = BrowserManager()
         self.excel_manager = ExcelManager()
 
+        self.test_cases = []
+
         self.setWindowTitle("Meter Webpage Test Automation")
         self.setMinimumSize(700, 500)
 
@@ -159,12 +161,11 @@ class MainWindow(QMainWindow):
 
         self.test_case_table = QTableWidget()
 
-        self.test_case_table.setColumnCount(10)
+        self.test_case_table.setColumnCount(9)
 
         self.test_case_table.setHorizontalHeaderLabels([
             "ID",
             "Page",
-            "Test Case",
             "Action",
             "Locator Type",
             "Locator",
@@ -188,21 +189,30 @@ class MainWindow(QMainWindow):
             self.test_case_table
         )
 
+        self.run_tests_button = QPushButton("RUN TESTS")
+        self.run_tests_button.setMinimumHeight(40)
+        self.run_tests_button.setEnabled(False)
+        self.run_tests_button.clicked.connect(self.run_tests)
+
+        main_layout.addWidget(self.run_tests_button)
+
         # -------------------------------------------------
-        # Future Test Area
+        # Test Execution
         # -------------------------------------------------
 
         test_group = QGroupBox("Test Execution")
 
         test_layout = QVBoxLayout()
 
-        test_info = QLabel(
-            "Test execution will be available after successful login."
+        self.test_execution_status = QLabel(
+            "Test execution is ready."
         )
 
-        test_info.setWordWrap(True)
+        self.test_execution_status.setWordWrap(True)
 
-        test_layout.addWidget(test_info)
+        test_layout.addWidget(
+            self.test_execution_status
+        )
 
         test_group.setLayout(test_layout)
 
@@ -240,12 +250,65 @@ class MainWindow(QMainWindow):
 
             return
 
-        self.display_test_cases(result)
+        # Store the loaded test cases
+        self.test_cases = result
+
+        # Display test cases in the table
+        self.display_test_cases(
+            self.test_cases
+        )
+
+        # Enable test execution
+        self.run_tests_button.setEnabled(True)
+
+        # Update execution status
+        self.test_execution_status.setText(
+            f"{len(self.test_cases)} test steps loaded. "
+            "Ready for execution."
+        )
 
         QMessageBox.information(
             self,
             "Excel Loaded",
-            f"{len(result)} test cases loaded successfully."
+            f"{len(self.test_cases)} test steps loaded successfully."
+        )
+
+    def run_tests(self):
+
+        if not self.browser_manager.page:
+            self.show_message(
+                "Error",
+                "Browser is not connected."
+            )
+            return
+
+        if not self.test_cases:
+            self.show_message(
+                "Error",
+                "Please upload test cases first."
+            )
+            return
+
+        from core.test_engine import TestEngine
+
+        engine = TestEngine(
+            self.browser_manager.page,
+            self.ip_input.text().strip()
+        )
+
+        results = engine.execute_test_cases(
+            self.test_cases
+        )
+
+        print("\n==============================")
+        print("TEST EXECUTION COMPLETED")
+        print("==============================")
+
+        for result in results:
+            print(result)
+
+        self.test_execution_status.setText(
+            "Test execution completed."
         )
 
     # -----------------------------------------------------
@@ -259,7 +322,6 @@ class MainWindow(QMainWindow):
         columns = [
             "ID",
             "Page",
-            "Test Case",
             "Action",
             "Locator Type",
             "Locator",
@@ -381,6 +443,33 @@ class MainWindow(QMainWindow):
                 self,
                 "Login Failed",
                 str(e)
+            )
+
+    # -----------------------------------------------------
+    # Message Box
+    # -----------------------------------------------------
+
+    def show_message(self, title, message, message_type="info"):
+
+        if message_type == "error":
+            QMessageBox.critical(
+                self,
+                title,
+                message
+            )
+
+        elif message_type == "warning":
+            QMessageBox.warning(
+                self,
+                title,
+                message
+            )
+
+        else:
+            QMessageBox.information(
+                self,
+                title,
+                message
             )
 
     # -----------------------------------------------------
