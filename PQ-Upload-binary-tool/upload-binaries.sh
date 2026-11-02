@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # GitHub destination repository
-REPO_URL="https://github.com/monalisa-elm/rockpi-dual-binaries.git"
+REPO_URL="https://github.com/Raghu41189/rockpi_Dual_binary.git"
 
 # Local GitHub repository location
 REPO_DIR="$HOME/rockpi-dual-binaries"
@@ -52,6 +52,8 @@ fi
 # Go to repository
 cd "$REPO_DIR" || exit 1
 
+# Update remote repository URL
+git remote set-url origin "$REPO_URL"
 
 # Switches your local repository to the main branch.
 git checkout "$BRANCH" || exit 1
