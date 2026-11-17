@@ -22,31 +22,31 @@
 
 1. Open the Ubuntu terminal.
 2. Log in to Raghu's PC.
-  ```bash
+   ```bash
    ssh elmpc_ubuntu@192.168.40.136
    ```
 3. Create Directory.
    ```bash
    mkdir <directory_name>
    ```
-4. Download the script
+4. Download the script.
    ```bash
    wget https://github.com/vinoth-elm/PQ-Development-Tools/blob/main/PQ-image-creation-tool/image_creation.sh
    ```
-5. Change the permission for file
+5. Change the permission for file.
    ```bash
    sudo chmod a+x image_creation.sh
    ```
-6.Run the image creation script.
-7.Select either Single Service or Dual Service.
-8.Enter the Git commit ID.
-9.Select the image size (1GB or 4GB or 8GB).
-10.Wait until the image creation process is completed.
+6. Run the image creation script.
+7. Select either Single Service or Dual Service.
+8. Enter the Git commit ID.
+9. Select the image size (1GB or 4GB or 8GB).
+10. Wait until the image creation process is completed.
 
-Note : Enter the Password if required.
+  Note : Enter the Password if required.
 
-11.Navigate to the Rockchip output directory:
-   ```bash
-   cd ~/bkp_vasu/Rock_Chip/out
-   ```
-12.Check for the successfully generated final system image
+11. Navigate to the Rockchip output directory:
+     ```bash
+     cd ~/bkp_vasu/Rock_Chip/out
+     ```
+11. Check for the successfully generated final system image.
