@@ -31,7 +31,7 @@
    ```
 4. Download the script.
    ```bash
-   wget https://github.com/vinoth-elm/PQ-Development-Tools/blob/main/PQ-image-creation-tool/image_creation.sh
+   wget -O image_creation.sh https://raw.githubusercontent.com/vinoth-elm/PQ-Development-Tools/main/PQ-image-creation-tool/image_creation.sh
    ```
 5. Change the permission for file.
    ```bash
