@@ -22,7 +22,7 @@
 ## 3. Steps to Use It
 
 1. Open the Ubuntu terminal.
-2. Log in to Vinoth's PC.
+2. Log in to elmpc-357 PC.
    ```bash
    ssh elmpc-357@192.168.40.145
    ```
