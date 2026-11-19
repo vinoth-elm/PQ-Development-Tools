@@ -32,7 +32,7 @@
    ```
 4. Download the script.
    ```bash
-   wget https://github.com/vinoth-elm/PQ-Development-Tools/blob/main/PQ-Application-compiling-tool/PQ-compiling_script.sh
+   wget -O PQ-compiling_script.sh https://raw.githubusercontent.com/vinoth-elm/PQ-Development-Tools/main/PQ-Application-compiling-tool/PQ-compiling_script.sh
    ```
 5. Change the permission for file.
    ```bash
